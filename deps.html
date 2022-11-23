@@ -1,0 +1,46 @@
+<script>
+    let activeEffect;
+    class Dep{
+        constructor(value){
+            this.subscriber = new Set();
+            this._value = value;
+        }
+        get value(){
+            this.depend();
+            return this._value;
+        }
+        set value(newvalue){
+            this._value = newvalue;
+            this.notify();
+        }
+        depend(){
+            if(activeEffect){
+                this.subscriber.add(activeEffect);
+            }
+        }
+        notify(){
+            this.subscriber.forEach(effect=> {
+                effect()
+            });
+        }
+    }
+
+    function watchEffect(effect){
+        activeEffect = effect;
+        effect()
+        activeEffect = null;
+    }
+
+    const dep1 = new Dep(true);
+    const dep = new Dep("hello");
+
+    watchEffect(()=>{
+        if(dep1.value){
+            console.log(dep.value);
+        }else{
+            console.log('false branch');
+        }
+    })
+
+    dep.value = "changed";
+</script>
